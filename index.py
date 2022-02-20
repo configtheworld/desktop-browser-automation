@@ -1,3 +1,4 @@
+from time import sleep
 import webbrowser
 import getopt
 import sys
@@ -27,9 +28,9 @@ with open(filename, 'r') as csvfile:
 argumentList = sys.argv[1:]
 
 # Options
-options = "a:r:op:l"
+options = "a:r:op:lh"
 # Long options
-long_options = ["add", "remove", "open", "play", "list"]
+long_options = ["add", "remove", "open", "play", "list", "help"]
 
 
 class BrowserAutomation ():
@@ -39,19 +40,21 @@ class BrowserAutomation ():
 
     def add(self, url):
         with open(filename, 'a') as csvfile:
-            cvswriter = csv.writer(csvfile)
-            cvswriter.writerows(
+            csvwriter = csv.writer(csvfile)
+            csvwriter.writerows(
                 [[len(rows)+1, url, "o"]])
             print("=> Added to list:", url)
+        self.refresh_list()
 
     def remove(self, number):
-        # with open(filename, 'w') as csvfile:
-        #     cvswriter = csv.DictWriter(csvfile, fieldnames=fields)
-        #     rows.remove(int(number))
-        #     cvswriter.writeheader()
-        #     cvswriter.writerows(rows)
-
-        print(number, "=> Not Removed from list Yet")
+        with open(filename, "w")as csvfile:
+            csvwriter = csv.writer(csvfile)
+            csvwriter.writerow(fields)
+            for row in rows:
+                if number != row[0]:
+                    csvwriter.writerow(row)
+            print("=> ", number, " removed to list!")
+        self.refresh_list()
 
     def open(self):
         print(currentValue, "=> Here is your favorite Tabs")
@@ -63,11 +66,19 @@ class BrowserAutomation ():
         print(currentValue, "=> Playing")
         # TODO
 
-    def show_list(self):
+    def show_list(self, rows):
         print("-Your URL List-")
         for row in rows:
             print(row[0], "=>",  "*open* " if row[2]
                   == "o" else "*play* ", row[1])
+
+    def refresh_list(self):
+        with open(filename, 'r') as csvfile:
+            rows_temp = []
+            csvreader = csv.reader(csvfile)
+            for row in csvreader:
+                rows_temp.append(row)
+            self.show_list(rows=rows_temp[1:])
 
 
 ba = BrowserAutomation()
@@ -94,7 +105,9 @@ try:
             ba.play()
         elif currentArgument in ("-l", "--list"):
             # show csv list
-            ba.show_list()
+            ba.show_list(rows=rows)
+        elif currentArgument in ("-h", "--help"):
+            print("Available Arguments: -a <url>, -r <list_index>, -o, -l")
 
 except getopt.error as err:
     # output error, and return with an error code
