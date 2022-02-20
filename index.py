@@ -30,9 +30,9 @@ with open(filename, 'r') as csvfile:
 argumentList = sys.argv[1:]
 
 # Options
-options = "a:r:oplhd"
+options = "a:r:s:oplhd"
 # Long options
-long_options = ["add", "remove", "open", "play", "list", "help", "all"]
+long_options = ["add", "remove", "song", "open", "play", "list", "help", "all"]
 
 done = False
 
@@ -47,6 +47,14 @@ class BrowserAutomation ():
             csvwriter = csv.writer(csvfile)
             csvwriter.writerows(
                 [[len(rows)+1, url, "o"]])
+            print("=> Added to list:", url)
+        self.refresh_list()
+
+    def add_song(self, url):
+        with open(filename, 'a') as csvfile:
+            csvwriter = csv.writer(csvfile)
+            csvwriter.writerows(
+                [[len(rows)+1, url, "p"]])
             print("=> Added to list:", url)
         self.refresh_list()
 
@@ -145,6 +153,9 @@ try:
         if currentArgument in ("-a", "--add"):
             # add url to csv
             ba.add(currentValue)
+        elif currentArgument in ("-s", "--song"):
+            # add song
+            ba.add_song(currentValue)
         elif currentArgument in ("-r", "--remove"):
             # remove url from csv
             ba.remove(currentValue)
