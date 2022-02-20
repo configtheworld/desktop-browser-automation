@@ -172,7 +172,7 @@ try:
             # show csv list
             ba.show_list(rows=rows)
         elif currentArgument in ("-h", "--help"):
-            print("Available Arguments: \n-a <url_for_open_tab>, \n-s <url_for_play_youtube>, \n-r <list_index_for_remove_item>, \n-o #opens tabs,\n-p #plays one youtube song, \n-d #opens one youtube link and all tabs,\n-l #shows the list")
+            print("Available Arguments: \n-a <url_for_open_tab>             || -all <url_for_open_tab>,\n-s <url_for_play_youtube>         || -song <url_for_play_youtube>,\n-r <list_index_for_remove_item>   || -remove <list_index_for_remove_item>,\n-o                                || -open #opens tabs,\n-p                                || -play #plays one youtube song ,\n-d                                || -all #opens one youtube link and all tabs,\n-l                                || --list #shows the list")
 
     done = True
 
