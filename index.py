@@ -1,9 +1,11 @@
-from time import sleep
 import webbrowser
+import pyautogui
 import getopt
 import sys
 import csv
-
+import itertools
+import threading
+import time
 
 # csv file name
 filename = "urls.csv"
@@ -28,9 +30,11 @@ with open(filename, 'r') as csvfile:
 argumentList = sys.argv[1:]
 
 # Options
-options = "a:r:op:lh"
+options = "a:r:op:lhd"
 # Long options
-long_options = ["add", "remove", "open", "play", "list", "help"]
+long_options = ["add", "remove", "open", "play", "list", "help", "all"]
+
+done = False
 
 
 class BrowserAutomation ():
@@ -57,14 +61,39 @@ class BrowserAutomation ():
         self.refresh_list()
 
     def open(self):
-        print(currentValue, "=> Here is your favorite Tabs")
-        for row in rows:
-            if row[2] == "o":
-                webbrowser.open_new_tab(row[1])
+        try:
+            print(currentValue, "=> Here is your favorite Tabs")
+            t = threading.Thread(target=self.animation)
+            t.start()  # prevent multiple musics playing same time
+            for row in rows:
+                if row[2] == "o":
+                    webbrowser.open_new_tab(row[1])
+
+        except webbrowser.Error as e:
+            print(e)
 
     def play(self):
         print(currentValue, "=> Playing")
         # TODO
+
+    def open_and_play(self):
+        try:
+            print(currentValue, "Opening and Playing ...")
+            t = threading.Thread(target=self.animation)
+            t.start()
+            play_flag = False  # prevent multiple musics playing same time
+            for row in rows:
+                if row[2] == "o":
+                    webbrowser.open_new_tab(row[1])
+                elif row[2] == "p" and play_flag != True:
+                    webbrowser.open_new_tab(row[1])
+                    time.sleep(10)
+
+                    pyautogui.press("space")
+                    play_flag = True
+
+        except webbrowser.Error as e:
+            print(e)
 
     def show_list(self, rows):
         print("-Your URL List-")
@@ -80,7 +109,17 @@ class BrowserAutomation ():
                 rows_temp.append(row)
             self.show_list(rows=rows_temp[1:])
 
+    def animation(self):
+        for c in itertools.cycle(['|', '/', '-', '\\']):
+            if done:
+                break
+            sys.stdout.write('\rloading ' + c)
+            sys.stdout.flush()
+            time.sleep(0.1)
+        sys.stdout.write('\rDone!     ')
 
+
+# create object
 ba = BrowserAutomation()
 
 
@@ -103,11 +142,16 @@ try:
         elif currentArgument in ("-p", "--play"):
             # play url
             ba.play()
+        elif currentArgument in ("-d", "--all"):
+            # open tabs and play url
+            ba.open_and_play()
         elif currentArgument in ("-l", "--list"):
             # show csv list
             ba.show_list(rows=rows)
         elif currentArgument in ("-h", "--help"):
             print("Available Arguments: -a <url>, -r <list_index>, -o, -l")
+
+    done = True
 
 except getopt.error as err:
     # output error, and return with an error code
