@@ -30,7 +30,7 @@ with open(filename, 'r') as csvfile:
 argumentList = sys.argv[1:]
 
 # Options
-options = "a:r:op:lhd"
+options = "a:r:oplhd"
 # Long options
 long_options = ["add", "remove", "open", "play", "list", "help", "all"]
 
@@ -73,8 +73,20 @@ class BrowserAutomation ():
             print(e)
 
     def play(self):
-        print(currentValue, "=> Playing")
-        # TODO
+        try:
+            print(currentValue, "Music playing ")
+            t = threading.Thread(target=self.animation)
+            t.start()
+            play_flag = False  # prevent multiple musics playing same time
+            for row in rows:
+                if row[2] == "p" and play_flag != True:
+                    webbrowser.open_new_tab(row[1])
+                    time.sleep(7)
+                    pyautogui.press("space")
+                    play_flag = True
+
+        except webbrowser.Error as e:
+            print(e)
 
     def open_and_play(self):
         try:
@@ -87,7 +99,7 @@ class BrowserAutomation ():
                     webbrowser.open_new_tab(row[1])
                 elif row[2] == "p" and play_flag != True:
                     webbrowser.open_new_tab(row[1])
-                    time.sleep(10)
+                    time.sleep(7)
 
                     pyautogui.press("space")
                     play_flag = True
