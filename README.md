@@ -34,3 +34,12 @@ open and play: `-d or --all`
 list: `-l or --list`
 
 help: `-h or --help`
+
+### To More Automation, Add Allias
+In order to open and play existing list with only one terminal command in linux, open your ~/.bashrc file and add what you want to automize like below then its callable with dba.
+```
+function dba {
+	cd <your_path>/desktop-browser-automation/
+	python3 index.py --all
+ }
+```
